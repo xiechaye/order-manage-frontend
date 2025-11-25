@@ -5,21 +5,71 @@ const BASE_URL = 'http://localhost:8080/api';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 2500, // Reduced timeout for faster fallback
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+// Mock Data
+const MOCK_USER: AdminUser = {
+  id: '1',
+  username: 'admin',
+  nickname: '演示管理员',
+  avatar: '',
+  status: 1,
+  createTime: '2024-01-01 10:00:00',
+  updateTime: '2024-01-01 10:00:00',
+  deleted: 0
+};
+
+const MOCK_ORDERS: Order[] = [
+  {
+    id: '101',
+    orderNo: 'ORD-20240320-001',
+    customerName: '张三',
+    customerPhone: '13800138000',
+    licensePlate: '粤A88888',
+    productName: '米其林轮胎 Pilot Sport 4',
+    productQuantity: 4,
+    orderStatus: OrderStatusEnum.PENDING_PICKUP,
+    remarks: '客户要求尽快提货',
+    createdAt: '2024-03-20 10:00:00',
+    updatedAt: '2024-03-20 10:00:00'
+  },
+  {
+    id: '102',
+    orderNo: 'ORD-20240321-002',
+    customerName: '李四',
+    customerPhone: '13900139000',
+    licensePlate: '粤B66666',
+    productName: '壳牌全合成机油保养套餐',
+    productQuantity: 1,
+    orderStatus: OrderStatusEnum.COMPLETED,
+    createdAt: '2024-03-21 14:30:00',
+    updatedAt: '2024-03-21 16:00:00'
+  },
+  {
+    id: '103',
+    orderNo: 'ORD-20240322-003',
+    customerName: '王五',
+    customerPhone: '13700137000',
+    licensePlate: '粤C12345',
+    productName: '博世雨刮器',
+    productQuantity: 2,
+    orderStatus: OrderStatusEnum.CANCELLED,
+    createdAt: '2024-03-22 09:15:00',
+    updatedAt: '2024-03-22 09:30:00'
+  }
+];
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    // Ensure token is a valid string and not "undefined" or "null" which can cause 400 Bad Request
     if (token && token !== 'undefined' && token !== 'null') {
       if (!config.headers) {
         config.headers = {} as any;
       }
-      // Using direct assignment which is compatible with both plain objects and AxiosHeaders proxy
       (config.headers as any)['Authorization'] = `Bearer ${token}`;
       (config.headers as any)['satoken'] = token;
       (config.headers as any)['token'] = token;
@@ -36,6 +86,87 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Mock Fallback for Timeout or Network Error
+    if (error.code === 'ECONNABORTED' || error.message.includes('Network Error')) {
+      console.warn('Backend unreachable (Timeout/Network Error). Serving Mock Data.');
+      const config = error.config;
+      const url = config.url || '';
+      const method = config.method || 'get';
+
+      // Helper to wrap data in Axios response structure
+      const mockResponse = (data: any) => Promise.resolve({
+        data: { code: 200, message: 'Mock Success', data },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      });
+
+      // 1. Mock Login
+      if (url.includes('/auth/login') && method === 'post') {
+        return mockResponse('mock-token-12345');
+      }
+
+      // 2. Mock User Info
+      if (url.includes('/auth/info') && method === 'get') {
+        return mockResponse(MOCK_USER);
+      }
+
+      // 3. Mock Orders List / Search
+      if (url.includes('/orders') && method === 'get') {
+        // Simple search filtering for mock
+        let records = [...MOCK_ORDERS];
+        if (config.params) {
+             const { licensePlate, orderNo, customerName } = config.params;
+             if (licensePlate) records = records.filter(o => o.licensePlate?.includes(licensePlate));
+             if (orderNo) records = records.filter(o => o.orderNo.includes(orderNo));
+             if (customerName) records = records.filter(o => o.customerName.includes(customerName));
+        }
+
+        return mockResponse({
+          records: records,
+          total: records.length,
+          size: config.params?.pageSize || 10,
+          current: config.params?.currentPage || 1,
+          pages: 1
+        });
+      }
+
+      // 4. Mock Order Detail
+      if (url.match(/\/orders\/\d+$/) && method === 'get') {
+         return mockResponse(MOCK_ORDERS[0]);
+      }
+
+      // 5. Mock Admin List
+      if (url.includes('/admin') && method === 'get') {
+        return mockResponse({
+          records: [MOCK_USER],
+          total: 1,
+          size: 10,
+          current: 1,
+          pages: 1
+        });
+      }
+
+      // 6. Mock Image Upload
+      if (url.includes('/upload/image') && method === 'post') {
+        return mockResponse({
+          status: 'success',
+          message: 'Mock Upload',
+          imageUrl: 'https://ui-avatars.com/api/?name=User&background=random',
+          imageId: 999,
+          fileSize: 1024,
+          mimeType: 'image/jpeg',
+          originalName: 'mock.jpg'
+        });
+      }
+
+      // 7. Generic Success for mutations (create, update, delete)
+      if (['post', 'put', 'delete'].includes(method)) {
+         return mockResponse(null);
+      }
+    }
+
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       window.dispatchEvent(new Event('auth:unauthorized'));
