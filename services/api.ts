@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { Result, Page, Order, OrderSearchParams, OrderStatusEnum, AdminUser, LoginParams, AdminSearchParams, UploadImageResponse } from '../types';
 
@@ -15,10 +14,12 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    // Ensure token is a valid string and not "undefined" or "null" which can cause 400 Bad Request
+    if (token && token !== 'undefined' && token !== 'null') {
       if (!config.headers) {
         config.headers = {} as any;
       }
+      // Using direct assignment which is compatible with both plain objects and AxiosHeaders proxy
       (config.headers as any)['Authorization'] = `Bearer ${token}`;
       (config.headers as any)['satoken'] = token;
       (config.headers as any)['token'] = token;

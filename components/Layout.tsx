@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, LogOut, Menu, X, User, Home, Gem } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Menu, User, Home, Gem } from 'lucide-react';
 import { AdminUser } from '../types';
 import { getImageUrl } from '../services/api';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface LayoutProps {
   user: AdminUser | null;
@@ -13,6 +14,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ user, currentPath, onNavigate, onLogout, children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   const NavItem = ({ path, icon: Icon, label }: { path: string, icon: any, label: string }) => {
     const isActive = currentPath === path;
@@ -32,6 +34,15 @@ export const Layout: React.FC<LayoutProps> = ({ user, currentPath, onNavigate, o
         {label}
       </button>
     );
+  };
+
+  const handleLogoutClick = () => {
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setIsLogoutConfirmOpen(false);
+    onLogout();
   };
 
   return (
@@ -77,7 +88,7 @@ export const Layout: React.FC<LayoutProps> = ({ user, currentPath, onNavigate, o
                </div>
              </div>
              <button
-               onClick={onLogout}
+               onClick={handleLogoutClick}
                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
              >
                <LogOut size={16} />
@@ -111,6 +122,15 @@ export const Layout: React.FC<LayoutProps> = ({ user, currentPath, onNavigate, o
            </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        title="确认退出"
+        message="您确定要退出登录吗？"
+        confirmText="退出"
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setIsLogoutConfirmOpen(false)}
+      />
     </div>
   );
 };
