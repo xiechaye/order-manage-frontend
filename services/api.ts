@@ -146,11 +146,11 @@ export const deleteImage = async (imageId: number) => {
 export const getImageUrl = (fileNameOrPath?: string) => {
   if (!fileNameOrPath) return '';
   if (fileNameOrPath.startsWith('http') || fileNameOrPath.startsWith('https')) return fileNameOrPath;
-  
+
   // Extract filename from path (e.g., /uploads/images/photo.jpg -> photo.jpg)
   const parts = fileNameOrPath.split('/');
   const fileName = parts[parts.length - 1];
-  
+
   // Return the API endpoint to fetch the image
   return `${BASE_URL}/upload/image/${fileName}`;
 };
