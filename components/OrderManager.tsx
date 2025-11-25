@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import dayjs from 'dayjs';
 import { 
@@ -115,7 +114,7 @@ export const OrderManager: React.FC = () => {
       orderNo: '',
       customerName: '',
       licensePlate: '',
-      orderStatus: '',
+      orderStatus: '' as OrderStatusEnum | '',
       startDate: '',
       endDate: ''
     };

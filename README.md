@@ -148,3 +148,93 @@ gold-brick-oms/
 └── docs/
     └── images/             # 文档图片资源
 ```
+
+## 🛠 系统架构 (Architecture)
+
+以下流程图展示了前端与后端的交互逻辑及权限控制流：
+
+```mermaid
+graph TD
+    User[用户访问] --> CheckAuth{是否有 Token?};
+    
+    subgraph 公共区域
+    CheckAuth -- 无 --> PublicAccess[LoginPage / HomePage];
+    PublicAccess --> SearchAPI[API: /orders/search (无需鉴权)];
+    PublicAccess --> LoginAPI[API: /auth/login];
+    end
+    
+    subgraph 鉴权区域
+    CheckAuth -- 有 --> Layout[Layout (Sidebar + Header)];
+    Layout --> UserInfo[API: /auth/info];
+    UserInfo -- 401 Unauthorized --> Logout[清除 Token 并跳转登录];
+    
+    Layout --> OrderMgr[订单管理];
+    Layout --> AdminMgr[管理员管理];
+    
+    OrderMgr --> OrderAPI[API: /orders (CRUD)];
+    AdminMgr --> AdminAPI[API: /admin (CRUD)];
+    AdminMgr --> UploadAPI[API: /upload/image];
+    end
+```
+
+## ⚙️ 核心技术细节
+
+### 1. 样式系统 (Tailwind CSS)
+本项目在 `index.html` 中直接通过 CDN 引入 Tailwind CSS 并配置了自定义主题，无需构建步骤即可使用原子化 CSS。
+
+```javascript
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#409eff', // 品牌主色
+        gold: '#f59e0b',    // 金砖特色
+      },
+      animation: {
+        'fade-in-down': 'fade-in-down 0.3s ease-out',
+      }
+    }
+  }
+}
+```
+
+### 2. 权限控制
+- **Token 注入**：`api.ts` 中的拦截器会自动将 `localStorage` 中的 token 注入到 `Authorization` (Bearer) 和 `satoken` 请求头中。
+- **全局拦截**：监听自定义事件 `auth:unauthorized`，当后端返回 401 时实现无感知的安全登出。
+
+## 🤝 贡献指南 (Contribution)
+
+欢迎提交 Issue 或 Pull Request！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
+
+## ❓ 常见问题 (FAQ)
+
+<details>
+<summary><strong>Q: 为什么上传图片显示失败？</strong></summary>
+A: 请检查后端 API 是否支持 `multipart/form-data`，并确保 `services/api.ts` 中的 `uploadImage` 方法请求头设置正确。前端会尝试解析返回的 `imageUrl`。
+</details>
+
+<details>
+<summary><strong>Q: 如何修改表格的分页大小？</strong></summary>
+A: 在 `OrderManager.tsx` 或 `AdminManager.tsx` 的 `pagination` 状态中修改 `pageSize` 默认值即可。
+</details>
+
+<details>
+<summary><strong>Q: 为什么不需要 npm install 和 build？</strong></summary>
+A: 本项目使用了 ES Modules 和 Import Maps，现代浏览器可以直接从 CDN 加载 React 等依赖。这使得开发极其轻量，但在生产环境建议配合 HTTP/2 服务器或简单的打包流程以优化加载性能。
+</details>
+
+## 📄 许可证 (License)
+
+本项目采用 **MIT 许可证** - 详情请参阅 [LICENSE](LICENSE) 文件。
+
+---
+
+<div align="center">
+  <p>Made with ❤️ by Gold Brick Team</p>
+</div>

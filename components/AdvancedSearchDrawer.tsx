@@ -23,7 +23,7 @@ export const AdvancedSearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onCl
       orderNo: '',
       customerName: '',
       licensePlate: '',
-      orderStatus: '',
+      orderStatus: '' as OrderStatusEnum | '',
       startDate: '',
       endDate: ''
     };
