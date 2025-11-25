@@ -57,6 +57,7 @@ function App() {
   const handleLoginSuccess = async () => {
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
+    setCurrentPath('home');
     // User info will be fetched by the effect
   };
 
@@ -69,6 +70,7 @@ function App() {
       localStorage.removeItem('token');
       setToken(null);
       setUser(null);
+      setCurrentPath('home');
     }
   };
 
