@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { OrderManager } from './components/OrderManager';
 import { AdminManager } from './components/AdminManager';
@@ -35,17 +34,20 @@ function App() {
             setUser(res.data);
           } else {
             // Only clear token if it's explicitly an auth error (handled mostly by interceptor)
-            // If code is not 200 but not 401, we generally don't logout immediately
             if (res.code === 401) {
                 localStorage.removeItem('token');
                 setToken(null);
             }
           }
-        } catch (error) {
+        } catch (error: any) {
            console.error("Failed to fetch user info", error);
-           // IMPORTANT: Do NOT clear token here on generic errors (like Network Error)
-           // If we clear token here, a simple network glitch logs the user out immediately.
-           // The 'auth:unauthorized' event listener handles 401s specifically.
+           // Fix: If the server returns 400 (Bad Request), 401 (Unauthorized), or 403 (Forbidden),
+           // it means the token is likely invalid or malformed. We should clear it to allow re-login.
+           if (error.response && (error.response.status === 400 || error.response.status === 401 || error.response.status === 403)) {
+             localStorage.removeItem('token');
+             setToken(null);
+             setUser(null);
+           }
         }
       }
       setLoading(false);
