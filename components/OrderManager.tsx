@@ -114,7 +114,7 @@ export const OrderManager: React.FC = () => {
       orderNo: '',
       customerName: '',
       licensePlate: '',
-      orderStatus: '' as OrderStatusEnum | '',
+      orderStatus: '' as unknown as OrderStatusEnum | '',
       startDate: '',
       endDate: ''
     };

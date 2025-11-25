@@ -1,11 +1,11 @@
 
 <div align="center">
-
+  
   <!-- Logo Placeholder: 请替换为实际的 logo 图片路径，例如 ./docs/images/logo.png -->
   <img src="https://ui-avatars.com/api/?name=Gold+Brick&background=f59e0b&color=fff&size=128&rounded=true&font-size=0.33" alt="金砖特价 Logo" width="120" height="120" style="border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
 
   <h1 style="margin-top: 20px;">🧱 金砖特价 (Gold Brick OMS)</h1>
-
+  
   <p align="center">
     <strong>新一代轻量级订单管理与查询系统</strong>
     <br />
@@ -70,20 +70,20 @@
 
 | 桌面端首页 | 查询结果页 |
 |:---:|:---:|
-| <img src="./docs/images/order-manage-layout-computer.jpg" alt="Home Page" width="100%"> | <img src="./docs/images/order-manage-layout-computer.jpg" alt="Search Results" width="100%"> |
+| <img src="https://via.placeholder.com/600x350/e5e7eb/1f2937?text=Home+Page+Search" alt="Home Page" width="100%"> | <img src="https://via.placeholder.com/600x350/e5e7eb/1f2937?text=Search+Results" alt="Search Results" width="100%"> |
 
 ### 2. 订单管理 (Order Management)
 核心业务区域，支持复杂筛选与批量操作。
 
-<img src="./docs/images/order-manage-order-manage-compute.jpg" alt="Order Dashboard" width="100%">
+<img src="https://via.placeholder.com/900x400/e5e7eb/1f2937?text=Order+Management+Dashboard+&+Filters" alt="Order Dashboard" width="100%">
 
 ### 3. 移动端适配 (Mobile Responsive)
 在手机上也能流畅管理业务。
 
 <div align="center">
-  <img src="./docs/images/order-manage-layout-mobile.jpg" width="24%" />
-  <img src="./docs/images/order-manage-admin-manage-mobile.jpg" width="24%" />
-  <img src="./docs/images/order-manage-order-manage-mobile.jpg" width="24%" />
+  <img src="https://via.placeholder.com/300x600/e5e7eb/1f2937?text=Login" width="24%" />
+  <img src="https://via.placeholder.com/300x600/e5e7eb/1f2937?text=List+View" width="24%" />
+  <img src="https://via.placeholder.com/300x600/e5e7eb/1f2937?text=Mobile+Menu" width="24%" />
 </div>
 
 ## 🚀 快速开始 (Quick Start)
@@ -106,7 +106,7 @@
 
 2. **启动本地服务器**
    你需要一个静态文件服务器来运行项目（因为浏览器不直接支持本地文件系统的 ESM 导入）。
-
+   
    使用 `npx` (无需安装):
    ```bash
    npx http-server . -p 3000
@@ -184,17 +184,17 @@ graph TD
 
 ```javascript
 tailwind.config = {
-    theme: {
-        extend: {
-            colors: {
-                primary: '#409eff', // 品牌主色
-                gold: '#f59e0b',    // 金砖特色
-            },
-            animation: {
-                'fade-in-down': 'fade-in-down 0.3s ease-out',
-            }
-        }
+  theme: {
+    extend: {
+      colors: {
+        primary: '#409eff', // 品牌主色
+        gold: '#f59e0b',    // 金砖特色
+      },
+      animation: {
+        'fade-in-down': 'fade-in-down 0.3s ease-out',
+      }
     }
+  }
 }
 ```
 
