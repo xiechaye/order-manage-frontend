@@ -148,24 +148,3 @@ gold-brick-oms/
 └── docs/
     └── images/             # 文档图片资源
 ```
-
-## 🛠 系统架构 (Architecture)
-
-以下流程图展示了前端与后端的交互逻辑及权限控制流：
-
-```mermaid
-graph TD
-    User[用户访问] --> CheckAuth{是否有 Token?};
-    
-    subgraph 公共区域
-    CheckAuth -- 无 --> PublicAccess[LoginPage / HomePage];
-    PublicAccess --> SearchAPI[API: /orders/search (无需鉴权)];
-    PublicAccess --> LoginAPI[API: /auth/login];
-    end
-    
-    subgraph 鉴权区域
-    CheckAuth -- 有 --> Layout[Layout (Sidebar + Header)];
-    Layout --> UserInfo[API: /auth/info];
-    UserInfo -- 401 Unauthorized --> Logout[清除 Token 并跳转登录];
-    
-    Layout --> OrderMgr[
